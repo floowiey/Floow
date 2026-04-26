@@ -27,8 +27,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    if (user?.darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
     return () => clearInterval(timer);
-  }, []);
+  }, [user?.darkMode]);
 
   const exportCSV = () => {
     let csv = 'Task,Date,Completed\n';
@@ -78,14 +83,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   ];
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden dark:bg-slate-950 transition-colors duration-500">
       {/* Sidebar */}
-      <aside className="w-20 md:w-64 glass m-4 flex flex-col p-4 z-10 transition-all duration-500 shadow-2xl shadow-indigo-100">
+      <aside className="w-20 md:w-64 glass m-4 flex flex-col p-4 z-10 transition-all duration-500 shadow-2xl shadow-indigo-100 dark:shadow-none">
         <div className="flex items-center gap-3 px-2 mb-10 overflow-hidden">
           <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center shrink-0 shadow-lg shadow-indigo-600/30">
             <span className="text-white font-black text-xl italic uppercase">f</span>
           </div>
-          <span className="font-bold text-xl tracking-tight text-indigo-950 uppercase hidden md:block">Floow</span>
+          <span className="font-bold text-xl tracking-tight text-indigo-950 dark:text-indigo-50 uppercase hidden md:block">Floow</span>
         </div>
 
         <nav className="flex-1 space-y-2">
@@ -95,27 +100,27 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               to={item.path}
               className={`flex items-center gap-3 p-3 rounded-2xl transition-all ${
                 location.pathname === item.path 
-                  ? 'bg-white text-indigo-600 shadow-sm font-semibold' 
-                  : 'text-slate-500 hover:bg-white/50 hover:text-indigo-600'
+                  ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-white shadow-sm font-semibold' 
+                  : 'text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-slate-800/50 hover:text-indigo-600 dark:hover:text-white'
               }`}
             >
-              <item.icon size={22} className={location.pathname === item.path ? 'text-indigo-600' : ''} />
+              <item.icon size={22} className={location.pathname === item.path ? 'text-indigo-600 dark:text-white' : ''} />
               <span className="hidden md:block">{item.name}</span>
             </Link>
           ))}
         </nav>
 
-        <div className="pt-4 mt-4 border-t border-slate-200/50 space-y-2">
+        <div className="pt-4 mt-4 border-t border-slate-200/50 dark:border-slate-800 space-y-2">
           <button 
             onClick={() => updateDarkMode(!user.darkMode)}
-            className="w-full flex items-center gap-3 p-3 rounded-2xl text-slate-500 hover:bg-white/50 hover:text-indigo-600 transition-all"
+            className="w-full flex items-center gap-3 p-3 rounded-2xl text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-slate-800/50 hover:text-indigo-600 dark:hover:text-white transition-all"
           >
             {user.darkMode ? <Sun size={22} /> : <Moon size={22} />}
             <span className="font-medium hidden md:block">Theme</span>
           </button>
           <button 
             onClick={logout}
-            className="w-full flex items-center gap-3 p-3 rounded-2xl text-rose-500 hover:bg-rose-50/50 transition-all text-left"
+            className="w-full flex items-center gap-3 p-3 rounded-2xl text-rose-500 hover:bg-rose-50/50 dark:hover:bg-rose-950/20 transition-all text-left"
           >
             <LogOut size={22} />
             <span className="font-medium hidden md:block">Logout</span>
@@ -130,20 +135,20 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-6">
              <div className="hidden lg:flex items-center gap-2 text-slate-400">
                 <Clock size={16} />
-                <span className="text-sm font-mono font-medium tracking-widest text-slate-600">
+                <span className="text-sm font-mono font-medium tracking-widest text-slate-600 dark:text-slate-400">
                   {format(currentTime, 'HH:mm:ss')}
                 </span>
              </div>
-             <div className="text-slate-400 text-xs font-bold uppercase tracking-widest hidden sm:block">
+             <div className="text-slate-400 dark:text-slate-500 text-xs font-bold uppercase tracking-widest hidden sm:block">
                {format(currentTime, 'MMMM yyyy')}
              </div>
           </div>
 
           <div className="flex items-center gap-4">
-             <div className="flex items-center gap-1 bg-slate-200/40 p-1 rounded-2xl border border-white/60">
+             <div className="flex items-center gap-1 bg-slate-200/40 dark:bg-slate-800/40 p-1 rounded-2xl border border-white/60 dark:border-slate-800">
                 <button 
                   onClick={exportCSV}
-                  className="p-2 hover:bg-white rounded-xl transition-all text-slate-500 hover:text-indigo-600 group flex items-center gap-2"
+                  className="p-2 hover:bg-white dark:hover:bg-slate-800 rounded-xl transition-all text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white group flex items-center gap-2"
                   title="Export CSV"
                 >
                   <Download size={18} />
@@ -151,7 +156,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </button>
                 <button 
                   onClick={exportJSON}
-                  className="p-2 hover:bg-white rounded-xl transition-all text-slate-500 hover:text-indigo-600 group flex items-center gap-2"
+                  className="p-2 hover:bg-white dark:hover:bg-slate-800 rounded-xl transition-all text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white group flex items-center gap-2"
                   title="Export JSON"
                 >
                   <FileJson size={18} />
@@ -159,14 +164,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </button>
              </div>
              
-             <div className="flex items-center gap-3 pl-4 border-l border-slate-200">
-               <div className="text-right hidden sm:block">
-                 <div className="text-sm font-bold text-slate-800 tracking-tight">{user.username}</div>
-                 <div className="text-[10px] text-slate-400 uppercase tracking-widest font-black">Member</div>
-               </div>
-               <div className="w-10 h-10 rounded-full bg-indigo-100 border-2 border-white flex items-center justify-center overflow-hidden shadow-sm">
-                 <UserIcon size={20} className="text-indigo-400" />
-               </div>
+             <div className="flex items-center gap-3 pl-4 border-l border-slate-200 dark:border-slate-800">
+                <div className="text-right hidden sm:block">
+                  <div className="text-sm font-bold text-slate-800 dark:text-slate-200 tracking-tight">{user.username}</div>
+                  <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-widest font-black">Member</div>
+                </div>
+                <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900 border-2 border-white dark:border-slate-800 flex items-center justify-center overflow-hidden shadow-sm">
+                  <UserIcon size={20} className="text-indigo-400 dark:text-indigo-200" />
+                </div>
              </div>
           </div>
         </header>

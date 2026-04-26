@@ -147,23 +147,23 @@ export default function Dashboard() {
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="glass-card w-full max-w-lg p-10 relative z-10 border-white"
+              className="glass-card w-full max-w-lg p-10 relative z-10 border-white dark:border-slate-800"
             >
               <div className="flex items-center gap-4 mb-8">
-                 <div className="w-12 h-12 rounded-2xl bg-indigo-100 flex items-center justify-center text-indigo-600">
+                 <div className="w-12 h-12 rounded-2xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
                     {editingTask ? <Settings2 size={24} /> : <Target size={24} />}
                  </div>
                  <div>
-                    <h2 className="text-2xl font-bold text-slate-800 tracking-tight">
+                    <h2 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
                         {editingTask ? 'Edit Goal' : 'New Goal'}
                     </h2>
-                    <p className="text-sm text-slate-400">Define your productivity boundaries</p>
+                    <p className="text-sm text-slate-400 dark:text-slate-500">Define your productivity boundaries</p>
                  </div>
               </div>
               
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
-                   <label className="text-[10px] uppercase font-bold text-slate-400 tracking-widest ml-1">Goal Name</label>
+                   <label className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-widest ml-1">Goal Name</label>
                    <input 
                     type="text" 
                     value={formData.name}
@@ -175,9 +175,9 @@ export default function Dashboard() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                       <label className="text-[10px] uppercase font-bold text-slate-400 tracking-widest ml-1">Timing</label>
+                       <label className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-widest ml-1">Timing</label>
                        <div className="relative">
-                          <Clock size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
+                          <Clock size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 dark:text-slate-600" />
                           <input 
                             type="text" 
                             value={formData.timeRange}
@@ -189,7 +189,7 @@ export default function Dashboard() {
                     </div>
                 </div>
                 <div className="space-y-2">
-                   <label className="text-[10px] uppercase font-bold text-slate-400 tracking-widest ml-1">Description</label>
+                   <label className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-widest ml-1">Description</label>
                    <textarea 
                     value={formData.description}
                     onChange={e => setFormData({...formData, description: e.target.value})}
@@ -211,65 +211,65 @@ export default function Dashboard() {
 
       {/* Header Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="glass-card p-8 flex items-center gap-6 border-transparent bg-white/40">
-          <div className="w-14 h-14 rounded-3xl bg-indigo-500/10 flex items-center justify-center text-indigo-600 shadow-sm">
+        <div className="glass-card p-8 flex items-center gap-6">
+          <div className="w-14 h-14 rounded-3xl bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-sm">
             <TrendingUp size={28} />
           </div>
           <div>
-            <div className="text-[10px] text-slate-400 uppercase font-black tracking-widest mb-1">Completion</div>
-            <div className="text-3xl font-bold text-slate-800 tracking-tighter">{stats.completionRate}%</div>
+            <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase font-black tracking-widest mb-1">Completion</div>
+            <div className="text-3xl font-bold text-slate-800 dark:text-white tracking-tighter">{stats.completionRate}%</div>
           </div>
         </div>
-        <div className="glass-card p-8 flex items-center gap-6 border-transparent bg-white/40">
-          <div className="w-14 h-14 rounded-3xl bg-purple-500/10 flex items-center justify-center text-purple-600 shadow-sm">
+        <div className="glass-card p-8 flex items-center gap-6">
+          <div className="w-14 h-14 rounded-3xl bg-purple-500/10 flex items-center justify-center text-purple-600 dark:text-purple-400 shadow-sm">
             <Trophy size={28} />
           </div>
           <div>
-            <div className="text-[10px] text-slate-400 uppercase font-black tracking-widest mb-1">Perfect Days</div>
-            <div className="text-3xl font-bold text-slate-800 tracking-tighter">{stats.perfectDays}</div>
+            <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase font-black tracking-widest mb-1">Perfect Days</div>
+            <div className="text-3xl font-bold text-slate-800 dark:text-white tracking-tighter">{stats.perfectDays}</div>
           </div>
         </div>
-        <div className="glass-card p-8 flex items-center gap-6 border-transparent bg-white/40">
-          <div className="w-14 h-14 rounded-3xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 shadow-sm">
+        <div className="glass-card p-8 flex items-center gap-6">
+          <div className="w-14 h-14 rounded-3xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-sm">
             <Target size={28} />
           </div>
           <div>
-            <div className="text-[10px] text-slate-400 uppercase font-black tracking-widest mb-1">Active Goals</div>
-            <div className="text-3xl font-bold text-slate-800 tracking-tighter">{stats.totalTasks}</div>
+            <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase font-black tracking-widest mb-1">Active Goals</div>
+            <div className="text-3xl font-bold text-slate-800 dark:text-white tracking-tighter">{stats.totalTasks}</div>
           </div>
         </div>
       </div>
 
       {/* Grid Controller */}
-      <div className="glass-card bg-white/80 border-white/90 overflow-hidden shadow-2xl">
-        <div className="p-8 border-b border-slate-100 flex flex-wrap items-center justify-between gap-6">
+      <div className="glass-card bg-white/80 dark:bg-slate-900/60 border-white/90 dark:border-slate-800/80 overflow-hidden shadow-2xl">
+        <div className="p-8 border-b border-slate-100 dark:border-white/5 flex flex-wrap items-center justify-between gap-6">
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-3">
-               <div className="w-10 h-10 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+               <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-slate-800 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
                   <LayoutGrid size={20} />
                </div>
                <div>
-                  <h2 className="text-xl font-bold text-slate-800 tracking-tight">Habit Matrix</h2>
-                  <p className="text-xs text-slate-400">Track and visualize your consistency</p>
+                  <h2 className="text-xl font-bold text-slate-800 dark:text-white tracking-tight">Habit Matrix</h2>
+                  <p className="text-xs text-slate-400 dark:text-slate-500">Track and visualize your consistency</p>
                </div>
             </div>
-            <div className="h-8 w-px bg-slate-100 mx-2 hidden md:block" />
-            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-2xl">
+            <div className="h-8 w-px bg-slate-100 dark:bg-white/10 mx-2 hidden md:block" />
+            <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl">
               <button 
                 onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-                className="p-1.5 hover:bg-white hover:shadow-sm rounded-xl transition-all text-slate-400 hover:text-indigo-600"
+                className="p-1.5 hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm rounded-xl transition-all text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-white"
               >
                 <ChevronLeft size={18} />
               </button>
               <button 
                 onClick={() => setCurrentMonth(new Date())}
-                className="px-4 py-1 text-[10px] font-black hover:bg-white hover:shadow-sm rounded-xl transition-all uppercase tracking-widest text-slate-500"
+                className="px-4 py-1 text-[10px] font-black hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm rounded-xl transition-all uppercase tracking-widest text-slate-500 dark:text-slate-400"
               >
                 Today
               </button>
               <button 
                 onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-                className="p-1.5 hover:bg-white hover:shadow-sm rounded-xl transition-all text-slate-400 hover:text-indigo-600"
+                className="p-1.5 hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm rounded-xl transition-all text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-white"
               >
                 <ChevronRight size={18} />
               </button>
@@ -284,19 +284,19 @@ export default function Dashboard() {
         <div className="overflow-x-auto scrollbar-hide">
           <table className="w-full border-collapse">
             <thead>
-              <tr className="border-b border-slate-50">
-                <th className="sticky left-0 z-20 bg-white/90 backdrop-blur-md p-6 text-left min-w-[240px] border-r border-slate-50">
-                  <span className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-300">Habit Name</span>
+              <tr className="border-b border-slate-50 dark:border-white/5">
+                <th className="sticky left-0 z-20 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md p-6 text-left min-w-[240px] border-r border-slate-50 dark:border-white/5">
+                  <span className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-300 dark:text-slate-700">Habit Name</span>
                 </th>
                 {daysInMonth.map(day => (
                   <th 
                     key={day.toISOString()} 
-                    className={`p-3 min-w-[50px] text-center border-r border-slate-50 ${
-                      format(day, 'E') === 'Sat' || format(day, 'E') === 'Sun' ? 'bg-indigo-50/30' : ''
+                    className={`p-3 min-w-[50px] text-center border-r border-slate-50 dark:border-white/5 ${
+                      format(day, 'E') === 'Sat' || format(day, 'E') === 'Sun' ? 'bg-indigo-50/30 dark:bg-indigo-900/10' : ''
                     }`}
                   >
-                    <div className="text-[9px] uppercase font-black text-slate-300 mb-0.5">{format(day, 'EEE')}</div>
-                    <div className={`text-sm font-bold ${isSameDay(day, new Date()) ? 'text-indigo-600 bg-indigo-50 rounded-lg p-1' : 'text-slate-400'}`}>
+                    <div className="text-[9px] uppercase font-black text-slate-300 dark:text-slate-700 mb-0.5">{format(day, 'EEE')}</div>
+                    <div className={`text-sm font-bold ${isSameDay(day, new Date()) ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg p-1' : 'text-slate-400 dark:text-slate-600'}`}>
                       {format(day, 'd')}
                     </div>
                   </th>
@@ -306,7 +306,7 @@ export default function Dashboard() {
             <tbody>
               {tasks.length === 0 && (
                 <tr>
-                  <td colSpan={daysInMonth.length + 1} className="p-32 text-center text-slate-300 italic font-medium">
+                  <td colSpan={daysInMonth.length + 1} className="p-32 text-center text-slate-300 dark:text-slate-700 italic font-medium">
                     No habits tracking yet. Let's start with your first goal.
                   </td>
                 </tr>
@@ -314,26 +314,26 @@ export default function Dashboard() {
               {tasks.map((task, taskIdx) => {
                 const colors = TASK_COLORS[taskIdx % TASK_COLORS.length];
                 return (
-                  <tr key={task.id} className="border-b border-slate-50 group hover:bg-slate-50/50 transition-colors">
-                    <td className="sticky left-0 z-20 bg-white/90 backdrop-blur-md px-6 py-4 border-r border-slate-50">
+                  <tr key={task.id} className="border-b border-slate-50 dark:border-white/5 group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                    <td className="sticky left-0 z-20 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-6 py-4 border-r border-slate-50 dark:border-white/5">
                       <div className="flex items-center justify-between group/row">
                         <div className="flex items-center gap-3 min-w-0 pr-4">
                           <div className={`w-2 h-8 rounded-full ${colors.bg}`} />
                           <div className="flex flex-col min-w-0">
-                            <span className="text-sm font-bold text-slate-700 truncate">{task.name}</span>
-                            <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">{task.timeRange || 'All Day'}</span>
+                            <span className="text-sm font-bold text-slate-700 dark:text-slate-300 truncate">{task.name}</span>
+                            <span className="text-[10px] font-black text-slate-300 dark:text-slate-700 uppercase tracking-widest">{task.timeRange || 'All Day'}</span>
                           </div>
                         </div>
                         <div className="flex items-center gap-1 opacity-0 group-hover/row:opacity-100 transition-opacity shrink-0">
                           <button 
                             onClick={() => handleOpenEdit(task)}
-                            className="p-1.5 hover:bg-indigo-50 text-slate-300 hover:text-indigo-600 rounded-lg transition-all"
+                            className="p-1.5 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 text-slate-300 dark:text-slate-600 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg transition-all"
                           >
                             <Edit2 size={14} />
                           </button>
                           <button 
                             onClick={() => handleDelete(task.id)}
-                            className="p-1.5 hover:bg-rose-50 text-slate-300 hover:text-rose-500 rounded-lg transition-all"
+                            className="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-900/30 text-slate-300 dark:text-slate-600 hover:text-rose-500 dark:hover:text-rose-400 rounded-lg transition-all"
                           >
                             <Trash2 size={14} />
                           </button>
@@ -350,8 +350,8 @@ export default function Dashboard() {
                         <td 
                           key={day.toISOString()}
                           onClick={() => handleToggle(task.id, day)}
-                          className={`p-1 h-14 border-r border-slate-50 cursor-pointer transition-all relative
-                            ${future ? 'cursor-not-allowed' : 'hover:bg-indigo-50/50'}
+                          className={`p-1 h-14 border-r border-slate-50 dark:border-white/5 cursor-pointer transition-all relative
+                            ${future ? 'cursor-not-allowed' : 'hover:bg-indigo-50/50 dark:hover:bg-indigo-900/20'}
                           `}
                         >
                           <div className="w-full h-full flex items-center justify-center">
@@ -367,9 +367,9 @@ export default function Dashboard() {
                                   <Check size={16} className="text-white" strokeWidth={3} />
                                 </motion.div>
                               ) : !future ? (
-                                <div className={`w-8 h-8 rounded-xl border border-slate-100 transition-all ${isToday ? 'border-indigo-200 bg-indigo-50/30' : 'group-hover:border-indigo-200'}`} />
+                                <div className={`w-8 h-8 rounded-xl border border-slate-100 dark:border-slate-800 transition-all ${isToday ? 'border-indigo-200 dark:border-indigo-800 bg-indigo-50/30 dark:bg-indigo-900/20' : 'group-hover:border-indigo-200 dark:group-hover:border-indigo-700'}`} />
                               ) : (
-                                  <div className="w-2 h-2 rounded-full bg-slate-100" />
+                                  <div className="w-2 h-2 rounded-full bg-slate-100 dark:bg-slate-800" />
                               )}
                             </AnimatePresence>
                           </div>

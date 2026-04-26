@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { 
   format, 
@@ -13,13 +13,14 @@ import {
   subMonths,
 } from 'date-fns';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeft, ChevronRight, X, StickyNote } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, StickyNote, Calendar as CalendarIcon, CheckCircle2 } from 'lucide-react';
 
 export default function Calendar() {
   const { tasks, toggleTask } = useApp();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDay, setSelectedDay] = useState<Date | null>(new Date());
   const [notes, setNotes] = useState<string>('');
+  const [isLoadingNotes, setIsLoadingNotes] = useState(false);
 
   const calendarDays = useMemo(() => {
     const start = startOfWeek(startOfMonth(currentMonth), { weekStartsOn: 0 });
@@ -37,18 +38,30 @@ export default function Calendar() {
 
   const handleDayClick = (day: Date) => {
     setSelectedDay(day);
-    fetchNote(day);
   };
 
+  useEffect(() => {
+    if (selectedDay) {
+       fetchNote(selectedDay);
+    }
+  }, [selectedDay]);
+
   const fetchNote = async (day: Date) => {
+    setIsLoadingNotes(true);
     const dateKey = format(day, 'yyyy-MM-dd');
-    const token = localStorage.getItem('token');
-    const res = await fetch(`/api/notes/${dateKey}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (res.ok) {
-      const data = await res.json();
-      setNotes(data.text);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`/api/notes/${dateKey}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setNotes(data.text || '');
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoadingNotes(false);
     }
   };
 
@@ -56,147 +69,183 @@ export default function Calendar() {
     if (!selectedDay) return;
     const dateKey = format(selectedDay, 'yyyy-MM-dd');
     const token = localStorage.getItem('token');
-    await fetch('/api/notes', {
-      method: 'POST',
-      headers: { 
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ date: dateKey, text: notes })
-    });
+    try {
+      await fetch('/api/notes', {
+        method: 'POST',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ date: dateKey, text: notes })
+      });
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      {/* Calendar Grid */}
-      <div className="lg:col-span-2 space-y-6">
-        <div className="glass-card p-6">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-serif font-black italic">
-               {format(currentMonth, 'MMMM yyyy')}
-            </h2>
-            <div className="flex gap-2">
-              <button 
-                onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-                className="btn-secondary p-2 rounded-full"
-              >
-                <ChevronLeft size={20} />
-              </button>
-              <button 
-                onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-                className="btn-secondary p-2 rounded-full"
-              >
-                <ChevronRight size={20} />
-              </button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-7 gap-px bg-white/5 border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
-              <div key={d} className="p-4 text-center text-[10px] uppercase tracking-widest text-white/30 font-bold bg-white/[0.02]">
-                {d}
-              </div>
-            ))}
-            {calendarDays.map(day => {
-              const { percentage, completed } = getDayStats(day);
-              const isSelected = selectedDay && isSameDay(day, selectedDay);
-              const isToday = isSameDay(day, new Date());
-              const currentMonthOnly = day.getMonth() === currentMonth.getMonth();
-
-              return (
-                <div 
-                  key={day.toISOString()}
-                  onClick={() => handleDayClick(day)}
-                  className={`relative h-24 md:h-32 p-2 transition-all cursor-pointer group
-                    ${currentMonthOnly ? 'bg-white/[0.03]' : 'bg-transparent grayscale opacity-20'}
-                    ${isSelected ? 'ring-2 ring-inset ring-white z-10' : 'hover:bg-white/10'}
-                  `}
-                >
-                  <div className={`text-sm font-bold mb-2 ${isToday ? 'bg-blue-500 w-6 h-6 flex items-center justify-center rounded-full shadow-lg shadow-blue-500/40' : ''}`}>
-                    {format(day, 'd')}
-                  </div>
-                  
-                  {percentage > 0 && (
-                    <div className="absolute bottom-4 left-2 right-2 space-y-1">
-                      <div className="flex items-center justify-between text-[10px] font-bold text-white/40">
-                         <span>{completed} done</span>
-                         <span>{percentage}%</span>
-                      </div>
-                      <div className="h-1 bg-white/5 rounded-full overflow-hidden">
-                        <motion.div 
-                          initial={{ width: 0 }}
-                          animate={{ width: `${percentage}%` }}
-                          className={`h-full rounded-full ${
-                            percentage === 100 ? 'bg-green-400' : percentage > 50 ? 'bg-blue-400' : 'bg-orange-400'
-                          }`}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+    <div className="space-y-8">
+      {/* Page Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+           <h2 className="text-3xl font-bold tracking-tight text-slate-800 dark:text-white">Calendar View</h2>
+           <p className="text-slate-500 dark:text-slate-400 font-medium">Track your historical consistency</p>
+        </div>
+        <div className="flex items-center gap-2 bg-white/50 dark:bg-slate-800/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800">
+           <button 
+             onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
+             className="p-2 hover:bg-white dark:hover:bg-slate-800 rounded-xl transition-all text-slate-500 dark:text-slate-400"
+           >
+             <ChevronLeft size={20} />
+           </button>
+           <div className="px-4 font-bold text-slate-700 dark:text-slate-200 min-w-[140px] text-center">
+             {format(currentMonth, 'MMMM yyyy')}
+           </div>
+           <button 
+             onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
+             className="p-2 hover:bg-white dark:hover:bg-slate-800 rounded-xl transition-all text-slate-500 dark:text-slate-400"
+           >
+             <ChevronRight size={20} />
+           </button>
         </div>
       </div>
 
-      {/* Details Side-pane */}
-      <AnimatePresence mode="wait">
-        {selectedDay && (
-          <motion.div 
-            key={selectedDay.toISOString()}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            className="space-y-6"
-          >
-            <div className="glass-card p-6">
-               <div className="flex items-center justify-between mb-6">
-                 <div>
-                   <div className="text-xs uppercase tracking-widest text-white/30 font-bold">Details for</div>
-                   <div className="text-xl font-serif font-black italic">{format(selectedDay, 'EEEE, d MMM')}</div>
-                 </div>
-                 <div className={`p-4 rounded-2xl ${getDayStats(selectedDay).percentage === 100 ? 'bg-green-500/10 text-green-400' : 'bg-white/5 text-white/40'} border border-white/10`}>
-                   <div className="text-2xl font-black">{getDayStats(selectedDay).percentage}%</div>
-                 </div>
-               </div>
-
-               <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 scrollbar-hide">
-                 <h3 className="text-[10px] uppercase font-bold text-white/20 tracking-widest border-b border-white/5 pb-2">Tracked Habits</h3>
-                 {tasks.map(task => {
-                   const dateKey = format(selectedDay, 'yyyy-MM-dd');
-                   const isDone = task.checks[dateKey];
-                   return (
-                     <div 
-                       key={task.id} 
-                       onClick={() => toggleTask(task.id, dateKey, !isDone)}
-                       className={`p-4 rounded-xl border border-white/5 transition-all cursor-pointer flex items-center justify-between
-                        ${isDone ? 'bg-green-400/10 border-green-400/20' : 'bg-white/[0.02] hover:bg-white/5'}
-                       `}
-                     >
-                       <span className={`text-sm ${isDone ? 'text-green-400 font-bold' : 'text-white/60'}`}>{task.name}</span>
-                       {isDone && <CheckIcon size={16} />}
-                     </div>
-                   );
-                 })}
-               </div>
-
-               <div className="mt-8 space-y-4 pt-6 border-t border-white/10">
-                 <div className="flex items-center gap-2 text-[10px] uppercase font-bold text-white/20 tracking-widest">
-                   <StickyNote size={12} /> Day Notes
-                 </div>
-                 <textarea 
-                   className="w-full h-32 bg-white/5 border border-white/10 rounded-xl p-4 text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-all font-mono"
-                   placeholder="Reflections on this day..."
-                   value={notes}
-                   onChange={e => setNotes(e.target.value)}
-                   onBlur={saveNote}
-                 />
-               </div>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Calendar Grid */}
+        <div className="lg:col-span-8">
+          <div className="glass-card overflow-hidden">
+            <div className="grid grid-cols-7 border-b border-slate-100 dark:border-slate-800/50">
+              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
+                <div key={d} className="py-4 text-center text-[10px] uppercase tracking-widest text-slate-400 font-black">
+                  {d}
+                </div>
+              ))}
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            <div className="grid grid-cols-7">
+              {calendarDays.map(day => {
+                const { percentage } = getDayStats(day);
+                const isSelected = selectedDay && isSameDay(day, selectedDay);
+                const isToday = isSameDay(day, new Date());
+                const currentMonthOnly = day.getMonth() === currentMonth.getMonth();
+
+                return (
+                  <motion.div 
+                    key={day.toISOString()}
+                    onClick={() => handleDayClick(day)}
+                    className={`relative h-24 md:h-32 p-3 border-r border-b border-slate-50 dark:border-white/5 transition-all cursor-pointer flex flex-col items-center justify-center group
+                      ${currentMonthOnly ? 'bg-white/50 dark:bg-slate-900/20' : 'bg-slate-100/30 dark:bg-slate-950/40 opacity-30'}
+                      ${isSelected ? 'bg-indigo-50/70 dark:bg-indigo-900/30 ring-2 ring-inset ring-indigo-500/50 z-10' : 'hover:bg-slate-50/50 dark:hover:bg-slate-800/40'}
+                    `}
+                  >
+                    <div className={`text-sm font-bold mb-3 ${isToday ? 'bg-indigo-600 text-white w-7 h-7 flex items-center justify-center rounded-xl shadow-lg shadow-indigo-600/20' : 'text-slate-600 dark:text-slate-400 opacity-70 group-hover:opacity-100'}`}>
+                      {format(day, 'd')}
+                    </div>
+                    
+                    {percentage > 0 && (
+                      <div className="flex flex-wrap gap-1 justify-center max-w-[80%]">
+                         {/* Visual indicator cluster */}
+                         <div className={`w-2 h-2 rounded-full ${percentage === 100 ? 'bg-emerald-500' : percentage > 50 ? 'bg-indigo-500' : 'bg-amber-500'}`} />
+                         {percentage > 75 && <div className={`w-2 h-2 rounded-full ${percentage === 100 ? 'bg-emerald-400' : 'bg-indigo-400'}`} />}
+                         {percentage === 100 && <div className="w-2 h-2 rounded-full bg-emerald-300" />}
+                      </div>
+                    )}
+                    
+                    {percentage > 0 && (
+                      <div className="absolute inset-x-3 bottom-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                         <div className="h-1 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                            <div className={`h-full ${percentage === 100 ? 'bg-emerald-500' : 'bg-indigo-500'}`} style={{ width: `${percentage}%` }} />
+                         </div>
+                      </div>
+                    )}
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Details Side-pane */}
+        <div className="lg:col-span-4 space-y-6">
+          <AnimatePresence mode="wait">
+            {selectedDay ? (
+              <motion.div 
+                key={selectedDay.toISOString()}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="space-y-6"
+              >
+                <div className="glass-card p-8">
+                   <div className="flex items-center justify-between mb-8">
+                     <div>
+                       <div className="text-[10px] uppercase tracking-widest text-slate-400 font-black mb-1">Schedule Analysis</div>
+                       <div className="text-2xl font-bold text-slate-800 dark:text-white">{format(selectedDay, 'EEEE, d MMM')}</div>
+                     </div>
+                     <div className={`w-16 h-16 rounded-2xl flex flex-col items-center justify-center border ${getDayStats(selectedDay).percentage === 100 ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400' : 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-100 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400'}`}>
+                       <div className="text-xl font-black">{getDayStats(selectedDay).percentage}%</div>
+                       <div className="text-[8px] font-black uppercase tracking-tighter">Done</div>
+                     </div>
+                   </div>
+
+                   <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 scrollbar-hide">
+                     <h3 className="text-[10px] uppercase font-black text-slate-300 dark:text-slate-600 tracking-widest border-b border-slate-100 dark:border-slate-800 pb-2 flex items-center justify-between">
+                        Tracked Status
+                        <span className="text-indigo-500">{getDayStats(selectedDay).completed} / {getDayStats(selectedDay).total}</span>
+                     </h3>
+                     {tasks.map(task => {
+                       const dateKey = format(selectedDay, 'yyyy-MM-dd');
+                       const isDone = task.checks[dateKey];
+                       return (
+                         <div 
+                           key={task.id} 
+                           onClick={() => toggleTask(task.id, dateKey, !isDone)}
+                           className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between group
+                            ${isDone 
+                              ? 'bg-emerald-50 dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-800/50' 
+                              : 'bg-white/50 dark:bg-slate-900/30 border-slate-100 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-800'}
+                           `}
+                         >
+                           <div className="flex items-center gap-3">
+                              <div className={`w-2 h-6 rounded-full ${isDone ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.4)]' : 'bg-slate-200 dark:bg-slate-800 group-hover:bg-indigo-300'}`} />
+                              <span className={`text-sm font-bold ${isDone ? 'text-emerald-700 dark:text-emerald-300' : 'text-slate-500 dark:text-slate-400 group-hover:text-indigo-600'}`}>{task.name}</span>
+                           </div>
+                           {isDone && <CheckCircle2 size={16} className="text-emerald-500" />}
+                         </div>
+                       );
+                     })}
+                   </div>
+
+                   <div className="mt-10 pt-8 border-t border-slate-100 dark:border-slate-800 space-y-4">
+                     <div className="flex items-center gap-2 text-[10px] uppercase font-black text-slate-400 tracking-widest">
+                       <StickyNote size={14} className="text-indigo-500" /> Reflection Log
+                     </div>
+                     <div className="relative">
+                       <textarea 
+                         className="w-full h-36 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/10 transition-all dark:text-slate-200 placeholder:text-slate-400 font-medium"
+                         placeholder="What happened today? Write down any thoughts..."
+                         value={notes}
+                         onChange={e => setNotes(e.target.value)}
+                         onBlur={saveNote}
+                         disabled={isLoadingNotes}
+                       />
+                       {isLoadingNotes && (
+                         <div className="absolute inset-0 flex items-center justify-center bg-white/40 dark:bg-slate-800/40 rounded-2xl">
+                            <div className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                         </div>
+                       )}
+                     </div>
+                   </div>
+                </div>
+              </motion.div>
+            ) : (
+              <div className="glass-card p-12 text-center flex flex-col items-center justify-center text-slate-300 dark:text-slate-700 h-[400px]">
+                 <CalendarIcon size={48} className="mb-4 opacity-20" />
+                 <p className="font-bold text-lg">Select a day to view productivity analysis</p>
+              </div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
     </div>
   );
 }
